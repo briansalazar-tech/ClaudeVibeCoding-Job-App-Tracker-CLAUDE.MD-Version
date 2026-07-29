@@ -1,0 +1,144 @@
+import { z } from 'zod'
+
+// Canonical enum values — imported by both db/schema.ts (Drizzle) and frontend components
+export const STATUS_VALUES = [
+  'applied',
+  'screening',
+  'interviewing',
+  'offer',
+  'accepted',
+  'rejected',
+  'withdrawn',
+] as const
+
+export const SOURCE_VALUES = [
+  'linkedin',
+  'referral',
+  'company_site',
+  'job_board',
+  'recruiter',
+  'other',
+] as const
+
+export const WORK_MODE_VALUES = ['remote', 'hybrid', 'onsite'] as const
+
+export type Status = (typeof STATUS_VALUES)[number]
+export type Source = (typeof SOURCE_VALUES)[number]
+export type WorkMode = (typeof WORK_MODE_VALUES)[number]
+
+// Pipeline order (for funnel chart — only forward-progress stages)
+export const PIPELINE_ORDER: Status[] = [
+  'applied',
+  'screening',
+  'interviewing',
+  'offer',
+  'accepted',
+]
+export const TERMINAL_STATUSES: Status[] = ['accepted', 'rejected', 'withdrawn']
+
+const isoToday = () => new Date().toISOString().slice(0, 10)
+
+export const applicationSchema = z
+  .object({
+    company: z.string().min(1, 'Company is required'),
+    role: z.string().min(1, 'Role is required'),
+    status: z.enum(STATUS_VALUES),
+    appliedDate: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/, 'Must be YYYY-MM-DD')
+      .refine((d) => d <= isoToday(), 'Applied date cannot be in the future'),
+    source: z.enum(SOURCE_VALUES),
+    location: z.string().nullable().optional(),
+    workMode: z.enum(WORK_MODE_VALUES).nullable().optional(),
+    salaryMin: z.number().int().positive().nullable().optional(),
+    salaryMax: z.number().int().positive().nullable().optional(),
+    url: z
+      .string()
+      .url('Must be a valid URL')
+      .nullable()
+      .optional()
+      .or(z.literal('').transform(() => null)),
+    contactName: z.string().nullable().optional(),
+    notes: z.string().nullable().optional(),
+  })
+  .refine(
+    (d) => d.salaryMin == null || d.salaryMax == null || d.salaryMin <= d.salaryMax,
+    { message: 'Salary min must be ≤ salary max', path: ['salaryMax'] },
+  )
+
+export type ApplicationFormValues = z.infer<typeof applicationSchema>
+
+// Separate from applicationSchema (form) — DB always returns null, never undefined for nullable cols
+export const applicationResponseSchema = z.object({
+  id: z.string().uuid(),
+  company: z.string(),
+  role: z.string(),
+  status: z.enum(STATUS_VALUES),
+  appliedDate: z.string(),
+  lastUpdated: z.string(),
+  source: z.enum(SOURCE_VALUES),
+  location: z.string().nullable(),
+  workMode: z.enum(WORK_MODE_VALUES).nullable(),
+  salaryMin: z.number().nullable(),
+  salaryMax: z.number().nullable(),
+  url: z.string().nullable(),
+  contactName: z.string().nullable(),
+  notes: z.string().nullable(),
+  deletedAt: z.string().nullable(),
+})
+
+export type Application = z.infer<typeof applicationResponseSchema>
+
+// Status badge color map — single source of truth, reused by charts
+export const STATUS_COLORS: Record<string, string> = {
+  applied: 'bg-blue-100 text-blue-800 border-blue-200',
+  screening: 'bg-amber-100 text-amber-800 border-amber-200',
+  interviewing: 'bg-purple-100 text-purple-800 border-purple-200',
+  offer: 'bg-green-100 text-green-800 border-green-200',
+  accepted: 'bg-emerald-600 text-white border-emerald-700',
+  rejected: 'bg-red-100 text-red-800 border-red-200',
+  withdrawn: 'bg-gray-100 text-gray-600 border-gray-200',
+  ghosted: 'bg-slate-100 text-slate-500 border-slate-200',
+}
+
+// Hex colors for Recharts (cannot use Tailwind classes in SVG)
+export const STATUS_CHART_COLORS: Record<string, string> = {
+  applied: '#93C5FD',
+  screening: '#FDE68A',
+  interviewing: '#C4B5FD',
+  offer: '#86EFAC',
+  accepted: '#059669',
+  rejected: '#FCA5A5',
+  withdrawn: '#D1D5DB',
+  ghosted: '#CBD5E1',
+}
+
+export const SOURCE_LABELS: Record<string, string> = {
+  linkedin: 'LinkedIn',
+  referral: 'Referral',
+  company_site: 'Company Site',
+  job_board: 'Job Board',
+  recruiter: 'Recruiter',
+  other: 'Other',
+}
+
+export const WORK_MODE_LABELS: Record<string, string> = {
+  remote: 'Remote',
+  hybrid: 'Hybrid',
+  onsite: 'Onsite',
+}
+
+export const STATUS_LABELS: Record<string, string> = {
+  applied: 'Applied',
+  screening: 'Screening',
+  interviewing: 'Interviewing',
+  offer: 'Offer',
+  accepted: 'Accepted',
+  rejected: 'Rejected',
+  withdrawn: 'Withdrawn',
+  ghosted: 'Ghosted',
+}
+
+export const patchStatusSchema = z.object({
+  status: z.enum(STATUS_VALUES),
+})
