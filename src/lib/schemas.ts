@@ -102,15 +102,17 @@ export const STATUS_COLORS: Record<string, string> = {
 }
 
 // Hex colors for Recharts (cannot use Tailwind classes in SVG)
+// Darker/more saturated than the badge palette on purpose — these render as
+// solid fills on a white chart surface, where the pastel badge tones read as washed out.
 export const STATUS_CHART_COLORS: Record<string, string> = {
-  applied: '#93C5FD',
-  screening: '#FDE68A',
-  interviewing: '#C4B5FD',
-  offer: '#86EFAC',
-  accepted: '#059669',
-  rejected: '#FCA5A5',
-  withdrawn: '#D1D5DB',
-  ghosted: '#CBD5E1',
+  applied: '#3B82F6',
+  screening: '#D97706',
+  interviewing: '#A855F7',
+  offer: '#16A34A',
+  accepted: '#065F46',
+  rejected: '#EF4444',
+  withdrawn: '#6B7280',
+  ghosted: '#94A3B8',
 }
 
 export const SOURCE_LABELS: Record<string, string> = {
