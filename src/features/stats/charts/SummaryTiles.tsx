@@ -12,7 +12,7 @@ function RateTile({
   rate: RateWithDenominator
 }) {
   return (
-    <div className="space-y-1">
+    <div className="space-y-1.5">
       <p className="text-xs text-muted-foreground uppercase tracking-wide">{label}</p>
       <p className="text-2xl font-bold" style={{ color: '#FE7F2D' }}>
         {formatPercent(rate.rate)}
@@ -28,8 +28,8 @@ export function SummaryTiles({ applications }: Props) {
   const stats = computeSummaryStats(applications)
 
   return (
-    <div className="grid grid-cols-2 gap-4 h-full">
-      <div className="space-y-1">
+    <div className="grid grid-cols-2 gap-5 h-full">
+      <div className="space-y-1.5">
         <p className="text-xs text-muted-foreground uppercase tracking-wide">Total Applied</p>
         <p className="text-2xl font-bold" style={{ color: '#FE7F2D' }}>
           {stats.totalApplied}
@@ -41,7 +41,7 @@ export function SummaryTiles({ applications }: Props) {
       <RateTile label="Interview Rate" rate={stats.interviewRate} />
       <RateTile label="Offer Rate" rate={stats.offerRate} />
 
-      <div className="col-span-2 border-t pt-2 space-y-1">
+      <div className="col-span-2 border-t pt-3 space-y-1.5">
         <p className="text-xs text-muted-foreground uppercase tracking-wide">
           Median Days to Response
         </p>

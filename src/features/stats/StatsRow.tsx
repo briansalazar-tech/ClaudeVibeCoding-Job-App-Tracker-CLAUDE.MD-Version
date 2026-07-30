@@ -8,7 +8,7 @@ type Props = { applications: Application[] }
 
 function ChartCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-lg border bg-card p-4 shadow-sm">
+    <div className="min-h-96 rounded-lg border bg-card p-4 shadow-sm">
       <h3 className="mb-3 text-sm font-semibold text-foreground">{title}</h3>
       {children}
     </div>
