@@ -63,6 +63,7 @@ src/
   lib/
     schemas.ts          # Zod schemas + inferred types
     format.ts           # date/currency/salary formatting
+    csv.ts              # CSV generation (pure) for the Export CSV button
 ```
 
 Feature-first, not type-first. A new feature gets a folder under `src/features/`, not files scattered
@@ -111,6 +112,11 @@ Rules:
   app, so it should never require opening a dialog.
 - Empty state: a real empty state with a call to action, not a blank table.
 - Virtualize only if row count exceeds ~500. Don't pre-optimize.
+- **Export CSV** button sits next to Add Application in the toolbar. Exports the table's
+  currently filtered rows (not the full dataset) — export is a view of what's on screen, same
+  principle as the charts. CSV generation is a pure function (`lib/csv.ts`); the DOM-triggered
+  download lives in the component, not in `lib/`, since `lib/` is shared with the Node build and
+  has no DOM lib available.
 
 ## The charts
 

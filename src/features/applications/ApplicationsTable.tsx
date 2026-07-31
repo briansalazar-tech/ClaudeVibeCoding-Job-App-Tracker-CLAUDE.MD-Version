@@ -8,7 +8,7 @@ import {
   type SortingState,
   type ColumnFiltersState,
 } from '@tanstack/react-table'
-import { Plus, Search, X } from 'lucide-react'
+import { Plus, Search, X, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -36,6 +36,8 @@ import {
   SOURCE_LABELS,
   type Application,
 } from '@/lib/schemas'
+import { applicationsToCsv } from '@/lib/csv'
+import { isoToday } from '@/lib/format'
 
 function getFiltersFromUrl(): ColumnFiltersState {
   const params = new URLSearchParams(window.location.search)
@@ -56,6 +58,16 @@ function syncFiltersToUrl(filters: ColumnFiltersState) {
   }
   const search = params.toString()
   history.replaceState(null, '', search ? `?${search}` : window.location.pathname)
+}
+
+function downloadCsv(filename: string, csv: string) {
+  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = filename
+  link.click()
+  URL.revokeObjectURL(url)
 }
 
 type Props = {
@@ -121,6 +133,11 @@ export function ApplicationsTable({ onFilteredApplicationsChange }: Props) {
   function openAdd() {
     setEditingApp(undefined)
     setFormOpen(true)
+  }
+
+  function handleExport() {
+    const csv = applicationsToCsv(filteredApplications)
+    downloadCsv(`job-applications-${isoToday()}.csv`, csv)
   }
 
   async function handleFormSubmit(values: Parameters<typeof createApplication>[0]) {
@@ -194,10 +211,20 @@ export function ApplicationsTable({ onFilteredApplicationsChange }: Props) {
           </Button>
         )}
 
-        <Button onClick={openAdd} className="ml-auto">
-          <Plus className="mr-2 h-4 w-4" />
-          Add Application
-        </Button>
+        <div className="ml-auto flex gap-2">
+          <Button
+            variant="outline"
+            onClick={handleExport}
+            disabled={filteredApplications.length === 0}
+          >
+            <Download className="mr-2 h-4 w-4" />
+            Export CSV
+          </Button>
+          <Button onClick={openAdd}>
+            <Plus className="mr-2 h-4 w-4" />
+            Add Application
+          </Button>
+        </div>
       </div>
 
       {/* Table */}
