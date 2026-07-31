@@ -15,6 +15,7 @@ export const STATUS_VALUES = [
 
 export const SOURCE_VALUES = [
   'linkedin',
+  'indeed',
   'referral',
   'company_site',
   'job_board',
@@ -151,6 +152,7 @@ export const STATUS_CHART_COLORS: Record<string, string> = {
 
 export const SOURCE_LABELS: Record<string, string> = {
   linkedin: 'LinkedIn',
+  indeed: 'Indeed',
   referral: 'Referral',
   company_site: 'Company Site',
   job_board: 'Job Board',

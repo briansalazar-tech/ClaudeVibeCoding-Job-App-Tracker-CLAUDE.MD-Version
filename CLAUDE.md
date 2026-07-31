@@ -84,7 +84,7 @@ across `components/`, `hooks/`, and `utils/`.
 | `status` | enum | see below |
 | `appliedDate` | date | required, ISO `YYYY-MM-DD` |
 | `lastUpdated` | date | auto-set on any edit; manually overridable via the form |
-| `source` | enum | `linkedin` \| `referral` \| `company_site` \| `job_board` \| `recruiter` \| `other` |
+| `source` | enum | `linkedin` \| `indeed` \| `referral` \| `company_site` \| `job_board` \| `recruiter` \| `other` |
 | `location` | text | nullable |
 | `workMode` | enum | `remote` \| `hybrid` \| `onsite` — nullable |
 | `salaryMin` / `salaryMax` | integer | nullable, whole dollars, no decimals — the posting's range. Captured in the form and CSV, not shown as a table column |
