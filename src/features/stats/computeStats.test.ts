@@ -242,11 +242,43 @@ describe('expanded summary stats', () => {
     expect(stats.applicationsThisMonth).toBe(2)
   })
 
+  it('applications last month only counts appliedDate in the previous calendar month', () => {
+    const apps = [
+      makeApp({ appliedDate: '2026-06-01' }),
+      makeApp({ appliedDate: '2026-06-30' }),
+      makeApp({ appliedDate: '2026-07-05' }), // this month, not last month
+      makeApp({ appliedDate: '2026-05-31' }), // two months back
+    ]
+    const stats = computeSummaryStats(apps, '2026-07-29')
+    expect(stats.applicationsLastMonth).toBe(2)
+  })
+
+  it('applications last month handles a January "today" rolling back into December', () => {
+    const apps = [
+      makeApp({ appliedDate: '2025-12-15' }),
+      makeApp({ appliedDate: '2026-01-02' }),
+    ]
+    const stats = computeSummaryStats(apps, '2026-01-10')
+    expect(stats.applicationsLastMonth).toBe(1)
+  })
+
+  it('applications in the last 90 days counts an inclusive rolling window ending today', () => {
+    const apps = [
+      makeApp({ appliedDate: '2026-07-29' }), // today
+      makeApp({ appliedDate: '2026-05-01' }), // 89 days back — inside the window
+      makeApp({ appliedDate: '2026-04-30' }), // 90 days back — just outside the window
+    ]
+    const stats = computeSummaryStats(apps, '2026-07-29')
+    expect(stats.applicationsLast90Days).toBe(2)
+  })
+
   it('returns zeros for empty array', () => {
     const stats = computeSummaryStats([], '2026-07-29')
     expect(stats.rejectionRate.numerator).toBe(0)
     expect(stats.ghostingRate.numerator).toBe(0)
     expect(stats.applicationsThisMonth).toBe(0)
+    expect(stats.applicationsLastMonth).toBe(0)
+    expect(stats.applicationsLast90Days).toBe(0)
   })
 })
 

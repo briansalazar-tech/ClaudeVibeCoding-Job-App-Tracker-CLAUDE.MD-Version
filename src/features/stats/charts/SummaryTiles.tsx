@@ -56,14 +56,30 @@ export function SummaryTiles({ applications, expanded = false }: Props) {
           <RateTile label="Rejection Rate" rate={stats.rejectionRate} />
           <RateTile label="Ghosting Rate" rate={stats.ghostingRate} />
 
-          <div className="col-span-2 border-t pt-3 space-y-1.5">
-            <p className="text-xs text-muted-foreground uppercase tracking-wide">
-              Applications This Month
-            </p>
-            <p className="text-2xl font-bold" style={{ color: '#FE7F2D' }}>
-              {stats.applicationsThisMonth}
-            </p>
-            <p className="text-xs text-muted-foreground">submitted this calendar month</p>
+          <div className="col-span-2 border-t pt-3">
+            <div className="grid grid-cols-3 gap-3">
+              <div className="space-y-1.5">
+                <p className="text-xs text-muted-foreground uppercase tracking-wide">This Month</p>
+                <p className="text-2xl font-bold" style={{ color: '#FE7F2D' }}>
+                  {stats.applicationsThisMonth}
+                </p>
+                <p className="text-xs text-muted-foreground">submitted this calendar month</p>
+              </div>
+              <div className="space-y-1.5">
+                <p className="text-xs text-muted-foreground uppercase tracking-wide">Last Month</p>
+                <p className="text-2xl font-bold" style={{ color: '#FE7F2D' }}>
+                  {stats.applicationsLastMonth}
+                </p>
+                <p className="text-xs text-muted-foreground">submitted last calendar month</p>
+              </div>
+              <div className="space-y-1.5">
+                <p className="text-xs text-muted-foreground uppercase tracking-wide">Last 90 Days</p>
+                <p className="text-2xl font-bold" style={{ color: '#FE7F2D' }}>
+                  {stats.applicationsLast90Days}
+                </p>
+                <p className="text-xs text-muted-foreground">submitted in the last 90 days</p>
+              </div>
+            </div>
           </div>
         </>
       )}

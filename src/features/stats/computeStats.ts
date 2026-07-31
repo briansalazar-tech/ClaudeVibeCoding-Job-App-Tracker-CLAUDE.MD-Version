@@ -26,6 +26,8 @@ export type SummaryStats = {
   rejectionRate: RateWithDenominator
   ghostingRate: RateWithDenominator
   applicationsThisMonth: number
+  applicationsLastMonth: number
+  applicationsLast90Days: number
 }
 
 export function isGhosted(app: Application, today = isoToday()): boolean {
@@ -66,6 +68,14 @@ function addDays(date: Date, days: number): Date {
   const d = new Date(date)
   d.setUTCDate(d.getUTCDate() + days)
   return d
+}
+
+// Returns the YYYY-MM of the calendar month before the given date string
+function getPreviousMonth(dateStr: string): string {
+  const d = new Date(dateStr + 'T00:00:00Z')
+  d.setUTCDate(1) // avoid month-length rollover (e.g. Mar 31 - 1 month landing on Mar 3)
+  d.setUTCMonth(d.getUTCMonth() - 1)
+  return toIso(d).slice(0, 7)
 }
 
 export function computeWeeklyApplications(
@@ -144,6 +154,13 @@ export function computeSummaryStats(apps: Application[], today = isoToday()): Su
   const currentMonth = today.slice(0, 7) // YYYY-MM
   const applicationsThisMonth = apps.filter((a) => a.appliedDate.slice(0, 7) === currentMonth).length
 
+  const previousMonth = getPreviousMonth(today)
+  const applicationsLastMonth = apps.filter((a) => a.appliedDate.slice(0, 7) === previousMonth).length
+
+  // Inclusive 90-day rolling window ending today (today minus 89 days through today)
+  const ninetyDaysAgo = toIso(addDays(new Date(today + 'T00:00:00Z'), -89))
+  const applicationsLast90Days = apps.filter((a) => a.appliedDate >= ninetyDaysAgo).length
+
   // Days from appliedDate to lastUpdated for apps that have moved beyond 'applied'
   const progressedApps = apps.filter((a) => a.status !== 'applied')
   const daysList = progressedApps.map((a) => daysBetween(a.appliedDate, a.lastUpdated))
@@ -177,5 +194,7 @@ export function computeSummaryStats(apps: Application[], today = isoToday()): Su
       denominator: total,
     },
     applicationsThisMonth,
+    applicationsLastMonth,
+    applicationsLast90Days,
   }
 }
