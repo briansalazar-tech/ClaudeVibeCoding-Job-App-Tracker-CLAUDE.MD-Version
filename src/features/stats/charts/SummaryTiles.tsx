@@ -2,7 +2,7 @@ import { computeSummaryStats, type RateWithDenominator } from '../computeStats'
 import { formatPercent } from '@/lib/format'
 import type { Application } from '@/lib/schemas'
 
-type Props = { applications: Application[] }
+type Props = { applications: Application[]; expanded?: boolean }
 
 function RateTile({
   label,
@@ -24,7 +24,7 @@ function RateTile({
   )
 }
 
-export function SummaryTiles({ applications }: Props) {
+export function SummaryTiles({ applications, expanded = false }: Props) {
   const stats = computeSummaryStats(applications)
 
   return (
@@ -50,6 +50,23 @@ export function SummaryTiles({ applications }: Props) {
         </p>
         <p className="text-xs text-muted-foreground">days from apply to first update</p>
       </div>
+
+      {expanded && (
+        <>
+          <RateTile label="Rejection Rate" rate={stats.rejectionRate} />
+          <RateTile label="Ghosting Rate" rate={stats.ghostingRate} />
+
+          <div className="col-span-2 border-t pt-3 space-y-1.5">
+            <p className="text-xs text-muted-foreground uppercase tracking-wide">
+              Applications This Month
+            </p>
+            <p className="text-2xl font-bold" style={{ color: '#FE7F2D' }}>
+              {stats.applicationsThisMonth}
+            </p>
+            <p className="text-xs text-muted-foreground">submitted this calendar month</p>
+          </div>
+        </>
+      )}
     </div>
   )
 }

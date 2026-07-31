@@ -190,6 +190,50 @@ describe('rate denominators', () => {
   })
 })
 
+// Expanded summary stats: rejection rate, ghosting rate, applications this month
+describe('expanded summary stats', () => {
+  it('rejection rate counts only rejected applications', () => {
+    const apps = [
+      makeApp({ status: 'rejected' }),
+      makeApp({ status: 'rejected' }),
+      makeApp({ status: 'withdrawn' }),
+      makeApp({ status: 'applied' }),
+    ]
+    const stats = computeSummaryStats(apps)
+    expect(stats.rejectionRate.numerator).toBe(2)
+    expect(stats.rejectionRate.denominator).toBe(4)
+  })
+
+  it('ghosting rate counts applications ghosted as of the given date', () => {
+    const apps = [
+      makeApp({ status: 'applied', lastUpdated: '2026-06-01' }), // ghosted as of 2026-07-29
+      makeApp({ status: 'applied', lastUpdated: '2026-07-28' }), // recent, not ghosted
+      makeApp({ status: 'rejected', lastUpdated: '2025-01-01' }), // terminal, never ghosted
+    ]
+    const stats = computeSummaryStats(apps, '2026-07-29')
+    expect(stats.ghostingRate.numerator).toBe(1)
+    expect(stats.ghostingRate.denominator).toBe(3)
+  })
+
+  it('applications this month only counts appliedDate in the given month', () => {
+    const apps = [
+      makeApp({ appliedDate: '2026-07-05' }),
+      makeApp({ appliedDate: '2026-07-29' }),
+      makeApp({ appliedDate: '2026-06-30' }),
+      makeApp({ appliedDate: '2026-08-01' }),
+    ]
+    const stats = computeSummaryStats(apps, '2026-07-29')
+    expect(stats.applicationsThisMonth).toBe(2)
+  })
+
+  it('returns zeros for empty array', () => {
+    const stats = computeSummaryStats([], '2026-07-29')
+    expect(stats.rejectionRate.numerator).toBe(0)
+    expect(stats.ghostingRate.numerator).toBe(0)
+    expect(stats.applicationsThisMonth).toBe(0)
+  })
+})
+
 // Week buckets with ties in date
 describe('ties in appliedDate', () => {
   it('two apps on the same date both appear in the same week bucket', () => {

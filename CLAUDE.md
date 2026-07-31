@@ -146,11 +146,21 @@ Rules:
 
 Four charts in the stats row, responsive: 4-across on desktop, 2×2 on tablet, stacked on mobile.
 
-1. **Funnel** — count at each pipeline stage, in pipeline order.
+1. **Funnel** — pie chart, one slice per pipeline stage (zero-count stages are filtered out before
+   rendering so the legend doesn't list stages nobody's in).
 2. **Applications over time** — bar chart, weekly buckets, last 12 weeks.
 3. **Outcomes by source** — stacked bar, so it's clear which channels actually convert.
 4. **Summary tiles** — total applied, response rate, interview rate, offer rate, median days to
-   first response. Numbers, not a chart, but it lives in the same row.
+   first response, plus (expanded only) rejection rate, ghosting rate, and applications this
+   calendar month. Numbers, not a chart, but it lives in the same row.
+
+Every card is independently expandable/collapsible (the icon button in the card header, top right)
+for a closer look — expanding trades the card's `min-h-96` for a taller `min-h-[42rem]` and, for the
+three chart cards, a taller `ResponsiveContainer` (200px → 460px). `SummaryTiles` uses its `expanded`
+prop to render three extra tiles instead of resizing a chart. Expand state lives in `StatsRow` as
+`Record<CardId, boolean>`, one card at a time or all four at once — they're independent. The grid
+uses `items-start` (not the default `stretch`) specifically so expanding one card doesn't stretch its
+siblings to match — each card's height comes only from its own `min-h-*` class and content.
 
 Chart rules:
 - All aggregation happens in `computeStats.ts` as pure functions over the applications array.

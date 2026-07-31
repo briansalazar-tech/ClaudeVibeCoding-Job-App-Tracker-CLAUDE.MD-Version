@@ -13,7 +13,7 @@ import { computeOutcomesBySource } from '../computeStats'
 import { STATUS_CHART_COLORS, STATUS_LABELS, SOURCE_LABELS } from '@/lib/schemas'
 import type { Application } from '@/lib/schemas'
 
-type Props = { applications: Application[] }
+type Props = { applications: Application[]; expanded?: boolean }
 
 const OUTCOME_KEYS = ['active', 'ghosted', 'rejected', 'withdrawn', 'accepted'] as const
 
@@ -33,7 +33,7 @@ const OUTCOME_LABELS: Record<string, string> = {
   accepted: STATUS_LABELS.accepted,
 }
 
-export function OutcomesBySource({ applications }: Props) {
+export function OutcomesBySource({ applications, expanded = false }: Props) {
   const data = computeOutcomesBySource(applications)
   const hasData = data.length > 0
 
@@ -56,7 +56,7 @@ export function OutcomesBySource({ applications }: Props) {
   }
 
   return (
-    <ResponsiveContainer width="100%" height={200}>
+    <ResponsiveContainer width="100%" height={expanded ? 460 : 200}>
       <BarChart data={data} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
         <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
         <XAxis

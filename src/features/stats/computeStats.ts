@@ -23,6 +23,9 @@ export type SummaryStats = {
   interviewRate: RateWithDenominator
   offerRate: RateWithDenominator
   medianDaysToFirstResponse: number | null
+  rejectionRate: RateWithDenominator
+  ghostingRate: RateWithDenominator
+  applicationsThisMonth: number
 }
 
 export function isGhosted(app: Application, today = isoToday()): boolean {
@@ -119,7 +122,7 @@ function median(numbers: number[]): number | null {
   return sorted.length % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid]
 }
 
-export function computeSummaryStats(apps: Application[]): SummaryStats {
+export function computeSummaryStats(apps: Application[], today = isoToday()): SummaryStats {
   const total = apps.length
 
   const responded = apps.filter((a) =>
@@ -131,6 +134,11 @@ export function computeSummaryStats(apps: Application[]): SummaryStats {
   ).length
 
   const offered = apps.filter((a) => ['offer', 'accepted'].includes(a.status)).length
+  const rejected = apps.filter((a) => a.status === 'rejected').length
+  const ghostedCount = apps.filter((a) => isGhosted(a, today)).length
+
+  const currentMonth = today.slice(0, 7) // YYYY-MM
+  const applicationsThisMonth = apps.filter((a) => a.appliedDate.slice(0, 7) === currentMonth).length
 
   // Days from appliedDate to lastUpdated for apps that have moved beyond 'applied'
   const progressedApps = apps.filter((a) => a.status !== 'applied')
@@ -154,5 +162,16 @@ export function computeSummaryStats(apps: Application[]): SummaryStats {
       denominator: total,
     },
     medianDaysToFirstResponse: median(daysList),
+    rejectionRate: {
+      rate: total > 0 ? rejected / total : 0,
+      numerator: rejected,
+      denominator: total,
+    },
+    ghostingRate: {
+      rate: total > 0 ? ghostedCount / total : 0,
+      numerator: ghostedCount,
+      denominator: total,
+    },
+    applicationsThisMonth,
   }
 }

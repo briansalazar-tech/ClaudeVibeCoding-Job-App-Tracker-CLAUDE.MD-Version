@@ -1,14 +1,16 @@
 import { useRef, useState, useEffect } from 'react'
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts'
+import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import { computeFunnelData } from '../computeStats'
 import { STATUS_CHART_COLORS, STATUS_LABELS } from '@/lib/schemas'
 import type { Application } from '@/lib/schemas'
 
-type Props = { applications: Application[] }
+type Props = { applications: Application[]; expanded?: boolean }
 
-export function FunnelChart({ applications }: Props) {
-  const data = computeFunnelData(applications)
-  const hasData = data.some((d) => d.count > 0)
+export function FunnelChart({ applications, expanded = false }: Props) {
+  // Zero-count stages would render as invisible, zero-angle slices — drop them so the
+  // legend only lists stages that actually have applications in them.
+  const data = computeFunnelData(applications).filter((d) => d.count > 0)
+  const hasData = data.length > 0
 
   const mountedRef = useRef(false)
   const [animate, setAnimate] = useState(false)
@@ -29,30 +31,34 @@ export function FunnelChart({ applications }: Props) {
   }
 
   return (
-    <ResponsiveContainer width="100%" height={200}>
-      <BarChart data={data} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-        <XAxis
-          dataKey="stage"
-          tick={{ fontSize: 11 }}
-          tickFormatter={(v: string) => STATUS_LABELS[v] ?? v}
-        />
-        <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
+    <ResponsiveContainer width="100%" height={expanded ? 460 : 200}>
+      <PieChart>
+        <Pie
+          data={data}
+          dataKey="count"
+          nameKey="stage"
+          cx="50%"
+          cy="45%"
+          outerRadius={expanded ? 160 : 65}
+          isAnimationActive={animate}
+          animationDuration={600}
+        >
+          {data.map((entry) => (
+            <Cell key={entry.stage} fill={STATUS_CHART_COLORS[entry.stage] ?? '#93C5FD'} />
+          ))}
+        </Pie>
         <Tooltip
           formatter={(value, _name, entry) => {
             const stage = String((entry.payload as Record<string, unknown>)?.['stage'] ?? '')
             return [value, STATUS_LABELS[stage] ?? stage]
           }}
         />
-        <Bar dataKey="count" isAnimationActive={animate} animationDuration={600}>
-          {data.map((entry) => (
-            <Cell
-              key={entry.stage}
-              fill={STATUS_CHART_COLORS[entry.stage] ?? '#93C5FD'}
-            />
-          ))}
-        </Bar>
-      </BarChart>
+        <Legend
+          formatter={(value: string) => STATUS_LABELS[value] ?? value}
+          iconSize={10}
+          wrapperStyle={{ fontSize: 11 }}
+        />
+      </PieChart>
     </ResponsiveContainer>
   )
 }

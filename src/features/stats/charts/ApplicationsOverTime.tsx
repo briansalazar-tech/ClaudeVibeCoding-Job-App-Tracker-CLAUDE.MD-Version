@@ -3,9 +3,9 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { computeWeeklyApplications } from '../computeStats'
 import type { Application } from '@/lib/schemas'
 
-type Props = { applications: Application[] }
+type Props = { applications: Application[]; expanded?: boolean }
 
-export function ApplicationsOverTime({ applications }: Props) {
+export function ApplicationsOverTime({ applications, expanded = false }: Props) {
   const data = computeWeeklyApplications(applications)
   const hasData = data.some((d) => d.count > 0)
 
@@ -28,7 +28,7 @@ export function ApplicationsOverTime({ applications }: Props) {
   }
 
   return (
-    <ResponsiveContainer width="100%" height={200}>
+    <ResponsiveContainer width="100%" height={expanded ? 460 : 200}>
       <BarChart data={data} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
         <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
         <XAxis
