@@ -1,5 +1,5 @@
 import { type ColumnDef, type FilterFn } from '@tanstack/react-table'
-import { ArrowUpDown } from 'lucide-react'
+import { ArrowUpDown, Trash2 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -22,6 +22,7 @@ import { formatDate } from '@/lib/format'
 export type TableMeta = {
   onStatusChange: (id: string, status: string) => void
   onRowClick: (app: Application) => void
+  onDeleteRow: (app: Application) => void
 }
 
 const multiValueFilter: FilterFn<Application> = (row, columnId, filterValue: string) => {
@@ -142,5 +143,28 @@ export const columns: ColumnDef<Application>[] = [
     ),
     cell: ({ row }) => formatDate(row.original.lastUpdated),
     sortingFn: 'alphanumeric',
+  },
+  {
+    id: 'actions',
+    header: '',
+    cell: ({ row, table }) => {
+      const meta = table.options.meta as TableMeta
+      const app = row.original
+
+      return (
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-7 w-7 text-muted-foreground hover:text-destructive"
+          aria-label={`Delete application for ${app.company}`}
+          onClick={(e) => {
+            e.stopPropagation()
+            meta.onDeleteRow(app)
+          }}
+        >
+          <Trash2 className="h-4 w-4" />
+        </Button>
+      )
+    },
   },
 ]

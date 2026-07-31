@@ -127,6 +127,9 @@ export function ApplicationsTable({ onFilteredApplicationsChange }: Props) {
         setEditingApp(app)
         setFormOpen(true)
       },
+      onDeleteRow: (app: Application) => {
+        handleQuickDelete(app)
+      },
     } satisfies TableMeta,
   })
 
@@ -162,6 +165,12 @@ export function ApplicationsTable({ onFilteredApplicationsChange }: Props) {
     if (editingApp) {
       await deleteApplication(editingApp.id)
     }
+  }
+
+  async function handleQuickDelete(app: Application) {
+    const confirmed = window.confirm(`Delete the application for ${app.role} at ${app.company}?`)
+    if (!confirmed) return
+    await deleteApplication(app.id)
   }
 
   const hasFilters = columnFilters.length > 0

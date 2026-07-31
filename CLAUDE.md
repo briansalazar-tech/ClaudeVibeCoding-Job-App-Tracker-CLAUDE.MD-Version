@@ -118,6 +118,10 @@ Rules:
 - Row click opens an edit dialog, not a separate route.
 - Inline status change via a dropdown in the status cell — this is the single most-used action in the
   app, so it should never require opening a dialog.
+- Inline delete via a trash icon in a dedicated actions column (last column) — same principle as
+  inline status change: deleting a row shouldn't require opening the edit dialog first. Guarded by a
+  native `window.confirm` (single-user app, no custom `AlertDialog` primitive yet) and still a soft
+  delete through the same `DELETE /api/applications/:id` route the edit dialog's Delete button uses.
 - Empty state: a real empty state with a call to action, not a blank table.
 - Virtualize only if row count exceeds ~500. Don't pre-optimize.
 - `salaryMin`/`salaryMax` (the posting's range) and `salaryRequirement` (the applicant's ask) are
