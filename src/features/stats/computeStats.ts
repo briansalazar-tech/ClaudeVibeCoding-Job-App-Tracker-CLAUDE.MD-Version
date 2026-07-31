@@ -134,7 +134,7 @@ export function computeSummaryStats(apps: Application[], today = isoToday()): Su
   ).length
 
   const interviewed = apps.filter((a) =>
-    [...INTERVIEW_STATUSES, 'offer', 'accepted'].includes(a.status),
+    ['screening', ...INTERVIEW_STATUSES, 'offer', 'accepted'].includes(a.status),
   ).length
 
   const offered = apps.filter((a) => ['offer', 'accepted'].includes(a.status)).length

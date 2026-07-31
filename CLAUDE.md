@@ -154,7 +154,9 @@ Four charts in the stats row, responsive: 4-across on desktop, 2×2 on tablet, s
 3. **Outcomes by source** — stacked bar, so it's clear which channels actually convert.
 4. **Summary tiles** — total applied, response rate, interview rate, offer rate, median days to
    first response, plus (expanded only) rejection rate, ghosting rate, and applications this
-   calendar month. Numbers, not a chart, but it lives in the same row.
+   calendar month. Numbers, not a chart, but it lives in the same row. **Interview rate** counts
+   `screening` alongside `INTERVIEW_STATUSES`, `offer`, and `accepted` — a screener call counts as
+   having reached the interview stage, not just a response.
 
 Every card has an expand/collapse toggle (the icon button in the card header, top right), but at
 most **one** card is expanded at a time — expanding a card hides the other three rather than

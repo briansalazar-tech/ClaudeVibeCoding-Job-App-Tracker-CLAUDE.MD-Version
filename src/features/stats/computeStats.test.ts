@@ -192,6 +192,18 @@ describe('rate denominators', () => {
     expect(stats.interviewRate.numerator).toBe(3)
     expect(stats.interviewRate.denominator).toBe(4)
   })
+
+  it('interview rate also counts screening alongside interview rounds', () => {
+    const apps = [
+      makeApp({ status: 'screening' }),
+      makeApp({ status: 'interview_1' }),
+      makeApp({ status: 'offer' }),
+      makeApp({ status: 'applied' }),
+    ]
+    const stats = computeSummaryStats(apps)
+    expect(stats.interviewRate.numerator).toBe(3)
+    expect(stats.interviewRate.denominator).toBe(4)
+  })
 })
 
 // Expanded summary stats: rejection rate, ghosting rate, applications this month
