@@ -48,45 +48,65 @@ function ChartCard({
 }
 
 export function StatsRow({ applications }: Props) {
-  const [expanded, setExpanded] = useState<Partial<Record<CardId, boolean>>>({})
+  // Only one card can be expanded at a time — expanding a card hides the other three so
+  // the expanded one can claim 50% of the row's width instead of competing for space.
+  const [expandedId, setExpandedId] = useState<CardId | null>(null)
 
   function toggle(id: CardId) {
-    setExpanded((prev) => ({ ...prev, [id]: !prev[id] }))
+    setExpandedId((prev) => (prev === id ? null : id))
   }
 
+  const showFunnel = expandedId === null || expandedId === 'funnel'
+  const showOverTime = expandedId === null || expandedId === 'overTime'
+  const showOutcomes = expandedId === null || expandedId === 'outcomes'
+  const showSummary = expandedId === null || expandedId === 'summary'
+
   return (
-    <div className="grid grid-cols-1 items-start gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      <ChartCard
-        title="Pipeline Funnel"
-        expanded={!!expanded.funnel}
-        onToggleExpand={() => toggle('funnel')}
-      >
-        {(isExpanded) => <FunnelChart applications={applications} expanded={isExpanded} />}
-      </ChartCard>
+    <div
+      className={cn(
+        'grid grid-cols-1 items-start gap-4 sm:grid-cols-2',
+        expandedId ? 'lg:grid-cols-2' : 'lg:grid-cols-4',
+      )}
+    >
+      {showFunnel && (
+        <ChartCard
+          title="Pipeline Funnel"
+          expanded={expandedId === 'funnel'}
+          onToggleExpand={() => toggle('funnel')}
+        >
+          {(isExpanded) => <FunnelChart applications={applications} expanded={isExpanded} />}
+        </ChartCard>
+      )}
 
-      <ChartCard
-        title="Applications Over Time"
-        expanded={!!expanded.overTime}
-        onToggleExpand={() => toggle('overTime')}
-      >
-        {(isExpanded) => <ApplicationsOverTime applications={applications} expanded={isExpanded} />}
-      </ChartCard>
+      {showOverTime && (
+        <ChartCard
+          title="Applications Over Time"
+          expanded={expandedId === 'overTime'}
+          onToggleExpand={() => toggle('overTime')}
+        >
+          {(isExpanded) => <ApplicationsOverTime applications={applications} expanded={isExpanded} />}
+        </ChartCard>
+      )}
 
-      <ChartCard
-        title="Outcomes by Source"
-        expanded={!!expanded.outcomes}
-        onToggleExpand={() => toggle('outcomes')}
-      >
-        {(isExpanded) => <OutcomesBySource applications={applications} expanded={isExpanded} />}
-      </ChartCard>
+      {showOutcomes && (
+        <ChartCard
+          title="Outcomes by Source"
+          expanded={expandedId === 'outcomes'}
+          onToggleExpand={() => toggle('outcomes')}
+        >
+          {(isExpanded) => <OutcomesBySource applications={applications} expanded={isExpanded} />}
+        </ChartCard>
+      )}
 
-      <ChartCard
-        title="Summary"
-        expanded={!!expanded.summary}
-        onToggleExpand={() => toggle('summary')}
-      >
-        {(isExpanded) => <SummaryTiles applications={applications} expanded={isExpanded} />}
-      </ChartCard>
+      {showSummary && (
+        <ChartCard
+          title="Summary"
+          expanded={expandedId === 'summary'}
+          onToggleExpand={() => toggle('summary')}
+        >
+          {(isExpanded) => <SummaryTiles applications={applications} expanded={isExpanded} />}
+        </ChartCard>
+      )}
     </div>
   )
 }

@@ -154,13 +154,18 @@ Four charts in the stats row, responsive: 4-across on desktop, 2×2 on tablet, s
    first response, plus (expanded only) rejection rate, ghosting rate, and applications this
    calendar month. Numbers, not a chart, but it lives in the same row.
 
-Every card is independently expandable/collapsible (the icon button in the card header, top right)
-for a closer look — expanding trades the card's `min-h-96` for a taller `min-h-[42rem]` and, for the
-three chart cards, a taller `ResponsiveContainer` (200px → 460px). `SummaryTiles` uses its `expanded`
-prop to render three extra tiles instead of resizing a chart. Expand state lives in `StatsRow` as
-`Record<CardId, boolean>`, one card at a time or all four at once — they're independent. The grid
-uses `items-start` (not the default `stretch`) specifically so expanding one card doesn't stretch its
-siblings to match — each card's height comes only from its own `min-h-*` class and content.
+Every card has an expand/collapse toggle (the icon button in the card header, top right), but at
+most **one** card is expanded at a time — expanding a card hides the other three rather than
+shrinking or stretching around them, so the expanded card can actually use the reclaimed space.
+Expanding trades the card's `min-h-96` for a taller `min-h-[42rem]`, the row's `lg:grid-cols-4` for
+`lg:grid-cols-2` (so the single remaining card fills 50% of the row's width instead of 25%), and,
+for the three chart cards, a taller `ResponsiveContainer` (200px → 460px). `SummaryTiles` uses its
+`expanded` prop to render three extra tiles instead of resizing a chart. Expand state lives in
+`StatsRow` as a single `expandedId: CardId | null` (not a per-card boolean map) — that's what makes
+"only one at a time, others hidden" the natural behavior rather than something enforced separately.
+The grid uses `items-start` (not the default `stretch`) so the expanded card's height doesn't need
+to stretch anything else to match — irrelevant now that siblings are hidden rather than resized, but
+still correct if that ever changes back.
 
 Chart rules:
 - All aggregation happens in `computeStats.ts` as pure functions over the applications array.
