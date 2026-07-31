@@ -87,8 +87,8 @@ across `components/`, `hooks/`, and `utils/`.
 | `source` | enum | `linkedin` \| `referral` \| `company_site` \| `job_board` \| `recruiter` \| `other` |
 | `location` | text | nullable |
 | `workMode` | enum | `remote` \| `hybrid` \| `onsite` — nullable |
-| `salaryMin` / `salaryMax` | integer | nullable, whole dollars, no decimals — the posting's range |
-| `salaryRequirement` | integer | nullable, whole dollars — the applicant's own ask, independent of the posting's range |
+| `salaryMin` / `salaryMax` | integer | nullable, whole dollars, no decimals — the posting's range. Captured in the form and CSV, not shown as a table column |
+| `salaryRequirement` | integer | nullable, whole dollars — the applicant's own ask, independent of the posting's range. Captured in the form and CSV, not shown as a table column |
 | `coverLetterSubmitted` | boolean | required, defaults to `false` |
 | `url` | text | nullable, link to the posting |
 | `contactName` | text | nullable |
@@ -120,6 +120,10 @@ Rules:
   app, so it should never require opening a dialog.
 - Empty state: a real empty state with a call to action, not a blank table.
 - Virtualize only if row count exceeds ~500. Don't pre-optimize.
+- `salaryMin`/`salaryMax` (the posting's range) and `salaryRequirement` (the applicant's ask) are
+  deliberately not table columns — they're still fully editable in the form and included in
+  CSV export/import. Don't re-add them as columns without checking this is still wanted; the
+  table's column set isn't just "every field on the model."
 - **Export CSV** button sits next to Add Application in the toolbar. Exports the table's
   currently filtered rows (not the full dataset) — export is a view of what's on screen, same
   principle as the charts. CSV generation is a pure function (`lib/csv.ts`); the DOM-triggered
