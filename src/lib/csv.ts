@@ -24,6 +24,8 @@ const CSV_COLUMNS = [
   'Work Mode',
   'Salary Min',
   'Salary Max',
+  'Salary Requirement',
+  'Cover Letter Submitted',
   'URL',
   'Contact Name',
   'Notes',
@@ -45,6 +47,8 @@ function applicationToRow(app: Application): string[] {
     app.workMode ? (WORK_MODE_LABELS[app.workMode] ?? app.workMode) : '',
     app.salaryMin != null ? String(app.salaryMin) : '',
     app.salaryMax != null ? String(app.salaryMax) : '',
+    app.salaryRequirement != null ? String(app.salaryRequirement) : '',
+    app.coverLetterSubmitted ? 'Yes' : 'No',
     app.url ?? '',
     app.contactName ?? '',
     app.notes ?? '',
@@ -67,6 +71,8 @@ const TEMPLATE_EXAMPLE_ROW = [
   'Remote',
   '120000',
   '160000',
+  '150000',
+  'Yes',
   'https://acme.com/jobs/123',
   'Jane Doe',
   'Found through a recruiter reach-out',
@@ -242,6 +248,17 @@ export function csvRecordToApplication(record: Record<string, string>): Imported
     salaryMax = null
   }
 
+  const salaryRequirement = parsePositiveInt(record['Salary Requirement'])
+  if (record['Salary Requirement']?.trim() && salaryRequirement == null) {
+    warnings.push('Invalid salary requirement — left blank')
+  }
+
+  const coverLetterRaw = (record['Cover Letter Submitted'] || '').trim().toLowerCase()
+  const coverLetterSubmitted = coverLetterRaw === 'yes'
+  if (coverLetterRaw && coverLetterRaw !== 'yes' && coverLetterRaw !== 'no') {
+    warnings.push(`Unrecognized cover letter value "${record['Cover Letter Submitted']}" — set to No`)
+  }
+
   const urlRaw = record['URL'] || ''
   let url: string | null = null
   if (urlRaw) {
@@ -264,6 +281,8 @@ export function csvRecordToApplication(record: Record<string, string>): Imported
       workMode,
       salaryMin,
       salaryMax,
+      salaryRequirement,
+      coverLetterSubmitted,
       url,
       contactName: record['Contact Name'] || null,
       notes: record['Notes'] || null,

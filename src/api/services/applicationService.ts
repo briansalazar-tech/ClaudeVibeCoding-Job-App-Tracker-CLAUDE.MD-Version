@@ -19,6 +19,8 @@ function mapRow(row: DbRow): Application {
     workMode: (row.work_mode as WorkMode | null) ?? null,
     salaryMin: (row.salary_min as number | null) ?? null,
     salaryMax: (row.salary_max as number | null) ?? null,
+    salaryRequirement: (row.salary_requirement as number | null) ?? null,
+    coverLetterSubmitted: Boolean(row.cover_letter_submitted),
     url: (row.url as string | null) ?? null,
     contactName: (row.contact_name as string | null) ?? null,
     notes: (row.notes as string | null) ?? null,
@@ -52,8 +54,9 @@ export const applicationService = {
     db.prepare(
       `INSERT INTO applications
          (id, company, role, status, applied_date, last_updated, source,
-          location, work_mode, salary_min, salary_max, url, contact_name, notes, deleted_at)
-       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,NULL)`,
+          location, work_mode, salary_min, salary_max, salary_requirement,
+          cover_letter_submitted, url, contact_name, notes, deleted_at)
+       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NULL)`,
     ).run(
       id,
       input.company,
@@ -66,6 +69,8 @@ export const applicationService = {
       input.workMode ?? null,
       input.salaryMin ?? null,
       input.salaryMax ?? null,
+      input.salaryRequirement ?? null,
+      input.coverLetterSubmitted ? 1 : 0,
       safeUrl(input.url),
       input.contactName ?? null,
       input.notes ?? null,
@@ -101,6 +106,14 @@ export const applicationService = {
       workMode: 'workMode' in input ? (input.workMode ?? null) : (existing.workMode ?? null),
       salaryMin: 'salaryMin' in input ? (input.salaryMin ?? null) : (existing.salaryMin ?? null),
       salaryMax: 'salaryMax' in input ? (input.salaryMax ?? null) : (existing.salaryMax ?? null),
+      salaryRequirement:
+        'salaryRequirement' in input
+          ? (input.salaryRequirement ?? null)
+          : (existing.salaryRequirement ?? null),
+      coverLetterSubmitted:
+        'coverLetterSubmitted' in input
+          ? (input.coverLetterSubmitted ?? false)
+          : existing.coverLetterSubmitted,
       url: 'url' in input ? safeUrl(input.url) : (existing.url ?? null),
       contactName:
         'contactName' in input ? (input.contactName ?? null) : (existing.contactName ?? null),
@@ -110,8 +123,8 @@ export const applicationService = {
     db.prepare(
       `UPDATE applications SET
          company=?,role=?,status=?,applied_date=?,source=?,
-         location=?,work_mode=?,salary_min=?,salary_max=?,
-         url=?,contact_name=?,notes=?,last_updated=?
+         location=?,work_mode=?,salary_min=?,salary_max=?,salary_requirement=?,
+         cover_letter_submitted=?,url=?,contact_name=?,notes=?,last_updated=?
        WHERE id=?`,
     ).run(
       merged.company,
@@ -123,6 +136,8 @@ export const applicationService = {
       merged.workMode,
       merged.salaryMin,
       merged.salaryMax,
+      merged.salaryRequirement,
+      merged.coverLetterSubmitted ? 1 : 0,
       merged.url,
       merged.contactName,
       merged.notes,

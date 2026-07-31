@@ -58,6 +58,8 @@ const defaultValues: ApplicationFormValues = {
   workMode: null,
   salaryMin: null,
   salaryMax: null,
+  salaryRequirement: null,
+  coverLetterSubmitted: false,
   url: null,
   contactName: null,
   notes: null,
@@ -85,6 +87,8 @@ export function ApplicationForm({ open, onOpenChange, application, onSubmit, onD
           workMode: application.workMode ?? null,
           salaryMin: application.salaryMin ?? null,
           salaryMax: application.salaryMax ?? null,
+          salaryRequirement: application.salaryRequirement ?? null,
+          coverLetterSubmitted: application.coverLetterSubmitted,
           url: application.url ?? null,
           contactName: application.contactName ?? null,
           notes: application.notes ?? null,
@@ -318,6 +322,54 @@ export function ApplicationForm({ open, onOpenChange, application, onSubmit, onD
                         }
                       />
                     </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="salaryRequirement"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Salary Requirement ($)</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        placeholder="150000"
+                        {...field}
+                        value={field.value ?? ''}
+                        onChange={(e) =>
+                          field.onChange(e.target.value ? parseInt(e.target.value, 10) : null)
+                        }
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="coverLetterSubmitted"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Cover Letter Submitted?</FormLabel>
+                    <Select
+                      onValueChange={(v) => field.onChange(v === 'yes')}
+                      value={field.value ? 'yes' : 'no'}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="yes">Yes</SelectItem>
+                        <SelectItem value="no">No</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}

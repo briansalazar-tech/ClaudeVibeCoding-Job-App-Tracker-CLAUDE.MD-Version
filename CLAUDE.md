@@ -48,7 +48,9 @@ src/
   api/                  # Hono routes, thin — validate, call a service, return
   db/
     schema.ts           # Drizzle table definitions
-    migrations/
+    migrations/          # 0000_, 0001_, … — db:migrate runs every *.sql file here, in
+                          # order; ADD COLUMN files are safe to re-run (duplicate-column
+                          # errors are swallowed) since there's no migrations-tracking table
   features/
     applications/
       ApplicationsTable.tsx
@@ -85,7 +87,9 @@ across `components/`, `hooks/`, and `utils/`.
 | `source` | enum | `linkedin` \| `referral` \| `company_site` \| `job_board` \| `recruiter` \| `other` |
 | `location` | text | nullable |
 | `workMode` | enum | `remote` \| `hybrid` \| `onsite` — nullable |
-| `salaryMin` / `salaryMax` | integer | nullable, whole dollars, no decimals |
+| `salaryMin` / `salaryMax` | integer | nullable, whole dollars, no decimals — the posting's range |
+| `salaryRequirement` | integer | nullable, whole dollars — the applicant's own ask, independent of the posting's range |
+| `coverLetterSubmitted` | boolean | required, defaults to `false` |
 | `url` | text | nullable, link to the posting |
 | `contactName` | text | nullable |
 | `notes` | text | nullable, markdown allowed |

@@ -66,6 +66,8 @@ export const applicationSchema = z
     workMode: z.enum(WORK_MODE_VALUES).nullable().optional(),
     salaryMin: z.number().int().positive().nullable().optional(),
     salaryMax: z.number().int().positive().nullable().optional(),
+    salaryRequirement: z.number().int().positive().nullable().optional(),
+    coverLetterSubmitted: z.boolean().default(false),
     url: z
       .string()
       .url('Must be a valid URL')
@@ -103,6 +105,8 @@ export const applicationResponseSchema = z.object({
   workMode: z.enum(WORK_MODE_VALUES).nullable(),
   salaryMin: z.number().nullable(),
   salaryMax: z.number().nullable(),
+  salaryRequirement: z.number().nullable(),
+  coverLetterSubmitted: z.boolean(),
   url: z.string().nullable(),
   contactName: z.string().nullable(),
   notes: z.string().nullable(),

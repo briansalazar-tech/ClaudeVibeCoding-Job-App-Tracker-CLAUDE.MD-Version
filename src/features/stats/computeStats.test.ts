@@ -21,6 +21,8 @@ function makeApp(overrides: Partial<Application> = {}): Application {
     workMode: null,
     salaryMin: null,
     salaryMax: null,
+    salaryRequirement: null,
+    coverLetterSubmitted: false,
     url: null,
     contactName: null,
     notes: null,

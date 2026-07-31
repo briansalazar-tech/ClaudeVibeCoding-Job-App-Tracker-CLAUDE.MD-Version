@@ -21,6 +21,8 @@ function makeApp(overrides: Partial<Application> = {}): Application {
     workMode: null,
     salaryMin: null,
     salaryMax: null,
+    salaryRequirement: null,
+    coverLetterSubmitted: false,
     url: null,
     contactName: null,
     notes: null,
@@ -33,7 +35,7 @@ describe('applicationsToCsv', () => {
   it('returns just the header row for an empty array', () => {
     const csv = applicationsToCsv([])
     expect(csv).toBe(
-      'Company,Role,Status,Applied Date,Last Updated,Source,Location,Work Mode,Salary Min,Salary Max,URL,Contact Name,Notes',
+      'Company,Role,Status,Applied Date,Last Updated,Source,Location,Work Mode,Salary Min,Salary Max,Salary Requirement,Cover Letter Submitted,URL,Contact Name,Notes',
     )
   })
 
@@ -50,7 +52,7 @@ describe('applicationsToCsv', () => {
   it('renders null fields as empty strings', () => {
     const csv = applicationsToCsv([makeApp()])
     const [, row] = csv.split('\r\n')
-    expect(row).toBe('Test Co,Engineer,Applied,2026-01-01,2026-01-02,LinkedIn,,,,,,,')
+    expect(row).toBe('Test Co,Engineer,Applied,2026-01-01,2026-01-02,LinkedIn,,,,,,No,,,')
   })
 
   it('quotes and escapes a field containing a comma', () => {
@@ -134,6 +136,8 @@ describe('csvRecordToApplication', () => {
     'Work Mode': 'Remote',
     'Salary Min': '100000',
     'Salary Max': '150000',
+    'Salary Requirement': '140000',
+    'Cover Letter Submitted': 'Yes',
     URL: 'https://acme.com/jobs/1',
     'Contact Name': 'Jane',
     Notes: 'Looks good',
@@ -153,6 +157,8 @@ describe('csvRecordToApplication', () => {
       workMode: 'remote',
       salaryMin: 100000,
       salaryMax: 150000,
+      salaryRequirement: 140000,
+      coverLetterSubmitted: true,
       url: 'https://acme.com/jobs/1',
       contactName: 'Jane',
       notes: 'Looks good',
@@ -219,6 +225,32 @@ describe('csvRecordToApplication', () => {
     expect(values.salaryMin).toBeNull()
     expect(values.salaryMax).toBeNull()
     expect(warnings.some((w) => w.includes('greater than salary max'))).toBe(true)
+  })
+
+  it('drops an unparseable salary requirement and warns', () => {
+    const { values, warnings } = csvRecordToApplication({
+      ...validRecord,
+      'Salary Requirement': 'a lot please',
+    })
+    expect(values.salaryRequirement).toBeNull()
+    expect(warnings.some((w) => w.includes('salary requirement'))).toBe(true)
+  })
+
+  it('defaults cover letter to No and warns on an unrecognized value, but stays silent when blank', () => {
+    const unrecognized = csvRecordToApplication({
+      ...validRecord,
+      'Cover Letter Submitted': 'Maybe',
+    })
+    expect(unrecognized.values.coverLetterSubmitted).toBe(false)
+    expect(unrecognized.warnings.some((w) => w.includes('cover letter'))).toBe(true)
+
+    const blank = csvRecordToApplication({ ...validRecord, 'Cover Letter Submitted': '' })
+    expect(blank.values.coverLetterSubmitted).toBe(false)
+    expect(blank.warnings.some((w) => w.includes('cover letter'))).toBe(false)
+
+    const no = csvRecordToApplication({ ...validRecord, 'Cover Letter Submitted': 'no' })
+    expect(no.values.coverLetterSubmitted).toBe(false)
+    expect(no.warnings).toEqual([])
   })
 
   it('drops a malformed URL and warns', () => {

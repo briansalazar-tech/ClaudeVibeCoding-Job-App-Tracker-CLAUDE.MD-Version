@@ -17,7 +17,7 @@ import {
   WORK_MODE_LABELS,
   type Application,
 } from '@/lib/schemas'
-import { formatDate, formatSalaryRange } from '@/lib/format'
+import { formatDate, formatSalaryRange, formatCurrency } from '@/lib/format'
 
 export type TableMeta = {
   onStatusChange: (id: string, status: string) => void
@@ -127,6 +127,17 @@ export const columns: ColumnDef<Application>[] = [
     id: 'salary',
     header: 'Salary',
     cell: ({ row }) => formatSalaryRange(row.original.salaryMin, row.original.salaryMax),
+  },
+  {
+    accessorKey: 'salaryRequirement',
+    header: 'Salary Req.',
+    cell: ({ row }) =>
+      row.original.salaryRequirement != null ? formatCurrency(row.original.salaryRequirement) : '—',
+  },
+  {
+    accessorKey: 'coverLetterSubmitted',
+    header: 'Cover Letter',
+    cell: ({ row }) => (row.original.coverLetterSubmitted ? 'Yes' : 'No'),
   },
   {
     accessorKey: 'lastUpdated',
