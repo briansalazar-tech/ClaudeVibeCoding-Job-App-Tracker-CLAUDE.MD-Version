@@ -52,6 +52,24 @@ export function useApplications() {
     [refetch],
   )
 
+  const importApplications = useCallback(
+    async (apps: ApplicationFormValues[]): Promise<Application[]> => {
+      const res = await fetch('/api/applications/import', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ applications: apps }),
+      })
+      if (!res.ok) {
+        const err = (await res.json().catch(() => null)) as { error?: string } | null
+        throw new Error(err?.error ?? 'Failed to import applications')
+      }
+      const { created } = (await res.json()) as { created: Application[] }
+      await refetch()
+      return created
+    },
+    [refetch],
+  )
+
   const updateApplication = useCallback(
     async (id: string, input: Partial<ApplicationFormValues>): Promise<Application> => {
       const res = await fetch(`/api/applications/${id}`, {
@@ -104,6 +122,7 @@ export function useApplications() {
     error: state.error,
     refetch,
     createApplication,
+    importApplications,
     updateApplication,
     updateStatus,
     deleteApplication,

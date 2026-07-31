@@ -8,7 +8,7 @@ import {
   type SortingState,
   type ColumnFiltersState,
 } from '@tanstack/react-table'
-import { Plus, Search, X, Download } from 'lucide-react'
+import { Plus, Search, X, Download, Upload } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -28,6 +28,7 @@ import {
 } from '@/components/ui/table'
 import { columns, type TableMeta } from './columns'
 import { ApplicationForm } from './ApplicationForm'
+import { ImportCsvDialog } from './ImportCsvDialog'
 import { useApplications } from './useApplications'
 import {
   STATUS_VALUES,
@@ -75,14 +76,23 @@ type Props = {
 }
 
 export function ApplicationsTable({ onFilteredApplicationsChange }: Props) {
-  const { applications, loading, error, createApplication, updateApplication, updateStatus, deleteApplication } =
-    useApplications()
+  const {
+    applications,
+    loading,
+    error,
+    createApplication,
+    importApplications,
+    updateApplication,
+    updateStatus,
+    deleteApplication,
+  } = useApplications()
 
   const [sorting, setSorting] = useState<SortingState>([{ id: 'appliedDate', desc: true }])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(() => getFiltersFromUrl())
 
   const [formOpen, setFormOpen] = useState(false)
   const [editingApp, setEditingApp] = useState<Application | undefined>(undefined)
+  const [importOpen, setImportOpen] = useState(false)
 
   const statusFilter = (columnFilters.find((f) => f.id === 'status')?.value as string) ?? ''
   const sourceFilter = (columnFilters.find((f) => f.id === 'source')?.value as string) ?? ''
@@ -212,6 +222,10 @@ export function ApplicationsTable({ onFilteredApplicationsChange }: Props) {
         )}
 
         <div className="ml-auto flex gap-2">
+          <Button variant="outline" onClick={() => setImportOpen(true)}>
+            <Upload className="mr-2 h-4 w-4" />
+            Import CSV
+          </Button>
           <Button
             variant="outline"
             onClick={handleExport}
@@ -313,6 +327,8 @@ export function ApplicationsTable({ onFilteredApplicationsChange }: Props) {
         onSubmit={handleFormSubmit}
         onDelete={editingApp ? handleDelete : undefined}
       />
+
+      <ImportCsvDialog open={importOpen} onOpenChange={setImportOpen} onImport={importApplications} />
     </div>
   )
 }

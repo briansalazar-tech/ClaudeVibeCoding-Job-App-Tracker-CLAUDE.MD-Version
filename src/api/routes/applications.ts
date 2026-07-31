@@ -14,6 +14,15 @@ export const applicationsRouter = new Hono()
     const created = applicationService.create(data)
     return c.json(created, 201)
   })
+  .post(
+    '/import',
+    zValidator('json', z.object({ applications: z.array(applicationSchema) })),
+    (c) => {
+      const { applications } = c.req.valid('json')
+      const created = applicationService.createMany(applications)
+      return c.json({ created }, 201)
+    },
+  )
   .get('/:id', (c) => {
     const id = c.req.param('id')
     const app = applicationService.getById(id)

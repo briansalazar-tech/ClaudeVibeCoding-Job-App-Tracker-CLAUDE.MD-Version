@@ -78,6 +78,10 @@ export const applicationService = {
     return this.getById(id)!
   },
 
+  createMany(inputs: ApplicationFormValues[]): Application[] {
+    return inputs.map((input) => this.create(input))
+  },
+
   update(id: string, input: Partial<ApplicationFormValues>): Application | undefined {
     const existing = this.getById(id)
     if (!existing) return undefined
