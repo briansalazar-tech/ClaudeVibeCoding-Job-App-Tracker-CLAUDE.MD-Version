@@ -146,8 +146,10 @@ Rules:
 
 Four charts in the stats row, responsive: 4-across on desktop, 2×2 on tablet, stacked on mobile.
 
-1. **Funnel** — pie chart, one slice per pipeline stage (zero-count stages are filtered out before
-   rendering so the legend doesn't list stages nobody's in).
+1. **Funnel** — pie chart, one slice per status: the `PIPELINE_ORDER` forward-progress stages plus
+   the terminal statuses `PIPELINE_ORDER` omits (`rejected`, `withdrawn` — `accepted` is already in
+   `PIPELINE_ORDER`), plus derived `ghosted` (zero-count stages are filtered out before rendering so
+   the legend doesn't list stages nobody's in).
 2. **Applications over time** — bar chart, weekly buckets, last 12 weeks.
 3. **Outcomes by source** — stacked bar, so it's clear which channels actually convert.
 4. **Summary tiles** — total applied, response rate, interview rate, offer rate, median days to

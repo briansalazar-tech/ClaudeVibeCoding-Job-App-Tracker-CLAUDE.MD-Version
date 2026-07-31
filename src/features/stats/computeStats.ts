@@ -38,7 +38,11 @@ export function getEffectiveStatus(app: Application, today = isoToday()): string
 }
 
 export function computeFunnelData(apps: Application[], today = isoToday()): FunnelDatum[] {
-  const base: FunnelDatum[] = PIPELINE_ORDER.map((stage) => ({
+  // PIPELINE_ORDER only covers forward-progress stages, so the terminal statuses it
+  // omits (rejected, withdrawn — accepted is already in PIPELINE_ORDER) are added back
+  // here; otherwise those slices could never appear in the funnel no matter the counts.
+  const stages = [...PIPELINE_ORDER, ...TERMINAL_STATUSES.filter((s) => !PIPELINE_ORDER.includes(s))]
+  const base: FunnelDatum[] = stages.map((stage) => ({
     stage,
     count: apps.filter((a) => a.status === stage).length,
   }))

@@ -92,7 +92,7 @@ describe('all terminal statuses', () => {
     makeApp({ status: 'withdrawn', appliedDate: '2026-01-10', lastUpdated: '2026-01-15' }),
   ]
 
-  it('funnel pipeline stages all zero', () => {
+  it('funnel forward-progress stages all zero, terminal stages counted', () => {
     const result = computeFunnelData(apps)
     const pipelineStages = ['applied', 'screening', 'interview_1', 'interview_2', 'interview_3', 'offer']
     pipelineStages.forEach((stage) => {
@@ -101,6 +101,10 @@ describe('all terminal statuses', () => {
     })
     const accepted = result.find((d) => d.stage === 'accepted')
     expect(accepted?.count).toBe(1)
+    const rejected = result.find((d) => d.stage === 'rejected')
+    expect(rejected?.count).toBe(1)
+    const withdrawn = result.find((d) => d.stage === 'withdrawn')
+    expect(withdrawn?.count).toBe(1)
   })
 
   it('none are ghosted because terminal statuses are excluded', () => {
