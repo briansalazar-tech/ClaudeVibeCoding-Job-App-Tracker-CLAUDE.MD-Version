@@ -1,4 +1,4 @@
-import { PIPELINE_ORDER, TERMINAL_STATUSES } from '@/lib/schemas'
+import { PIPELINE_ORDER, TERMINAL_STATUSES, INTERVIEW_STATUSES } from '@/lib/schemas'
 import { daysBetween, isoToday } from '@/lib/format'
 import type { Application } from '@/lib/schemas'
 
@@ -123,11 +123,11 @@ export function computeSummaryStats(apps: Application[]): SummaryStats {
   const total = apps.length
 
   const responded = apps.filter((a) =>
-    ['screening', 'interviewing', 'offer', 'accepted', 'rejected'].includes(a.status),
+    ['screening', ...INTERVIEW_STATUSES, 'offer', 'accepted', 'rejected'].includes(a.status),
   ).length
 
   const interviewed = apps.filter((a) =>
-    ['interviewing', 'offer', 'accepted'].includes(a.status),
+    [...INTERVIEW_STATUSES, 'offer', 'accepted'].includes(a.status),
   ).length
 
   const offered = apps.filter((a) => ['offer', 'accepted'].includes(a.status)).length

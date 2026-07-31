@@ -4,7 +4,9 @@ import { z } from 'zod'
 export const STATUS_VALUES = [
   'applied',
   'screening',
-  'interviewing',
+  'interview_1',
+  'interview_2',
+  'interview_3',
   'offer',
   'accepted',
   'rejected',
@@ -30,11 +32,16 @@ export type WorkMode = (typeof WORK_MODE_VALUES)[number]
 export const PIPELINE_ORDER: Status[] = [
   'applied',
   'screening',
-  'interviewing',
+  'interview_1',
+  'interview_2',
+  'interview_3',
   'offer',
   'accepted',
 ]
 export const TERMINAL_STATUSES: Status[] = ['accepted', 'rejected', 'withdrawn']
+// Any round of interviewing — grouped here so "interview rate" etc. don't have to
+// enumerate all three rounds at every call site.
+export const INTERVIEW_STATUSES: Status[] = ['interview_1', 'interview_2', 'interview_3']
 
 const isoToday = () => new Date().toISOString().slice(0, 10)
 
@@ -108,7 +115,9 @@ export type Application = z.infer<typeof applicationResponseSchema>
 export const STATUS_COLORS: Record<string, string> = {
   applied: 'bg-blue-100 text-blue-800 border-blue-200',
   screening: 'bg-amber-100 text-amber-800 border-amber-200',
-  interviewing: 'bg-purple-100 text-purple-800 border-purple-200',
+  interview_1: 'bg-violet-100 text-violet-800 border-violet-200',
+  interview_2: 'bg-purple-100 text-purple-800 border-purple-200',
+  interview_3: 'bg-fuchsia-100 text-fuchsia-800 border-fuchsia-200',
   offer: 'bg-green-100 text-green-800 border-green-200',
   accepted: 'bg-emerald-600 text-white border-emerald-700',
   rejected: 'bg-red-100 text-red-800 border-red-200',
@@ -119,10 +128,16 @@ export const STATUS_COLORS: Record<string, string> = {
 // Hex colors for Recharts (cannot use Tailwind classes in SVG)
 // Darker/more saturated than the badge palette on purpose — these render as
 // solid fills on a white chart surface, where the pastel badge tones read as washed out.
+// The three interview rounds are an ordinal progression, not independent categories, so they
+// share one hue (violet) in monotone light→dark steps rather than three distinct hues — see
+// scripts/validate_palette.js --ordinal in the dataviz skill, which is what these three steps
+// were validated against (adjacent ΔL >= 0.06, light end >= 2:1 contrast).
 export const STATUS_CHART_COLORS: Record<string, string> = {
   applied: '#3B82F6',
   screening: '#D97706',
-  interviewing: '#A855F7',
+  interview_1: '#A78BFA',
+  interview_2: '#7C3AED',
+  interview_3: '#5B21B6',
   offer: '#16A34A',
   accepted: '#065F46',
   rejected: '#EF4444',
@@ -148,7 +163,9 @@ export const WORK_MODE_LABELS: Record<string, string> = {
 export const STATUS_LABELS: Record<string, string> = {
   applied: 'Applied',
   screening: 'Screening',
-  interviewing: 'Interviewing',
+  interview_1: '1st Interview',
+  interview_2: '2nd Interview',
+  interview_3: '3rd Interview',
   offer: 'Offer',
   accepted: 'Accepted',
   rejected: 'Rejected',

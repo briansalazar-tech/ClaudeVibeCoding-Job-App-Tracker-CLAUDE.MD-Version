@@ -91,9 +91,12 @@ across `components/`, `hooks/`, and `utils/`.
 | `notes` | text | nullable, markdown allowed |
 
 **Status pipeline** (ordered — order is meaningful for the funnel chart):
-`applied` → `screening` → `interviewing` → `offer` → `accepted`, with terminal states
-`rejected` and `withdrawn` reachable from any stage, and `ghosted` derived (not stored) when a
-non-terminal application has had no update in 30+ days.
+`applied` → `screening` → `interview_1` → `interview_2` → `interview_3` → `offer` → `accepted`,
+with terminal states `rejected` and `withdrawn` reachable from any stage, and `ghosted` derived
+(not stored) when a non-terminal application has had no update in 30+ days. The three interview
+rounds (labeled "1st/2nd/3rd Interview") are grouped in `INTERVIEW_STATUSES` — use that constant
+instead of re-enumerating all three at call sites that mean "any interview round" (interview rate,
+response rate, etc.).
 
 Rules:
 - Never hard-delete. Soft-delete with `deletedAt` and filter it out at the query layer.
@@ -150,6 +153,12 @@ Chart rules:
   an empty axis.
 - Rates are computed against a stated denominator and labeled with it. "Response rate 40% (8 of 20)"
   not a bare percentage.
+- `interview_1`/`interview_2`/`interview_3` share one hue (violet) at monotone lightness steps in
+  `STATUS_CHART_COLORS`, rather than three unrelated hues — they're an ordinal progression, not
+  independent categories, so they're validated as an ordinal ramp, not three categorical slots.
+  Badges (`STATUS_COLORS`) still give them three distinct named colors (violet/purple/fuchsia)
+  since a small text-bearing pill doesn't need the same adjacency-CVD treatment a bare chart fill
+  does. Re-validate with the dataviz skill's `validate_palette.js` before changing either.
 - Don't animate on every re-render. Animation on mount only.
 
 ## Color Pallet

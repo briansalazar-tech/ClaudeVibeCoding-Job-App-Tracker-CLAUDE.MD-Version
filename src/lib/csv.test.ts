@@ -39,10 +39,10 @@ describe('applicationsToCsv', () => {
 
   it('renders human-readable labels for status, source, and work mode', () => {
     const csv = applicationsToCsv([
-      makeApp({ status: 'interviewing', source: 'company_site', workMode: 'hybrid' }),
+      makeApp({ status: 'interview_2', source: 'company_site', workMode: 'hybrid' }),
     ])
     const [, row] = csv.split('\r\n')
-    expect(row).toContain('Interviewing')
+    expect(row).toContain('2nd Interview')
     expect(row).toContain('Company Site')
     expect(row).toContain('Hybrid')
   })
@@ -126,7 +126,7 @@ describe('csvRecordToApplication', () => {
   const validRecord = {
     Company: 'Acme',
     Role: 'Engineer',
-    Status: 'Interviewing',
+    Status: '2nd Interview',
     'Applied Date': '2026-01-01',
     'Last Updated': '2026-01-05',
     Source: 'Company Site',
@@ -145,7 +145,7 @@ describe('csvRecordToApplication', () => {
     expect(values).toEqual({
       company: 'Acme',
       role: 'Engineer',
-      status: 'interviewing',
+      status: 'interview_2',
       appliedDate: '2026-01-01',
       lastUpdated: '2026-01-05',
       source: 'company_site',
@@ -162,10 +162,10 @@ describe('csvRecordToApplication', () => {
   it('matches raw lowercase enum values as well as display labels', () => {
     const { values, warnings } = csvRecordToApplication({
       ...validRecord,
-      Status: 'interviewing',
+      Status: 'interview_2',
       Source: 'company_site',
     })
-    expect(values.status).toBe('interviewing')
+    expect(values.status).toBe('interview_2')
     expect(values.source).toBe('company_site')
     expect(warnings).toEqual([])
   })

@@ -92,7 +92,7 @@ describe('all terminal statuses', () => {
 
   it('funnel pipeline stages all zero', () => {
     const result = computeFunnelData(apps)
-    const pipelineStages = ['applied', 'screening', 'interviewing', 'offer']
+    const pipelineStages = ['applied', 'screening', 'interview_1', 'interview_2', 'interview_3', 'offer']
     pipelineStages.forEach((stage) => {
       const d = result.find((r) => r.stage === stage)
       expect(d?.count).toBe(0)
@@ -173,6 +173,18 @@ describe('rate denominators', () => {
     // This is a zod schema test but can also be validated here for consistency
     const app = makeApp({ salaryMin: 100000, salaryMax: 100000 })
     expect(app.salaryMin).toBe(app.salaryMax)
+  })
+
+  it('interview rate counts all three interview rounds', () => {
+    const apps = [
+      makeApp({ status: 'interview_1' }),
+      makeApp({ status: 'interview_2' }),
+      makeApp({ status: 'interview_3' }),
+      makeApp({ status: 'applied' }),
+    ]
+    const stats = computeSummaryStats(apps)
+    expect(stats.interviewRate.numerator).toBe(3)
+    expect(stats.interviewRate.denominator).toBe(4)
   })
 })
 
