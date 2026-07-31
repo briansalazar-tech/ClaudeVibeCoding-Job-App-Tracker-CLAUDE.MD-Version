@@ -1,15 +1,23 @@
 # Job Application Tracker
 
 A single-user web app for tracking a job search: one table for every application, one row of
-charts summarizing the pipeline at a glance.
+charts summarizing the pipeline at a glance. Every application carries its full history — company,
+role, status, key dates, source, work mode, salary range and your own salary requirement, whether
+a cover letter went out, and free-form notes — and moving it through the pipeline (applied →
+screening → interviews → offer/accepted, or rejected/withdrawn along the way) automatically feeds
+the charts and rate calculations above the table, so the dashboard always reflects exactly what's
+in the table with no separate step to keep them in sync.
 
 ![Dashboard overview](project_screenshots/ReadmeHeader.png)
+
+More screenshots (edit form, expanded charts, CSV import) are in [`project_screenshots/`](project_screenshots/).
+
+The original attempt at this project can be found in the [ClaudeVibeCoding-Job-App-Tracker-ChatVersion Repo](https://github.com/briansalazar-tech/ClaudeVibeCoding-Job-App-Tracker-ChatVersion). That project was completed entirely using Claude Chat.
 
 ## Features
 
 - **Applications table** — sortable, filterable by status/source/company, inline status changes,
-  and a full edit form (company, role, status, dates, salary range + your own salary requirement,
-  work mode, source, cover letter submitted, contact, notes).
+  and a full edit form for everything else.
 - **Pipeline funnel, as a pie chart** — applied → screening → 1st/2nd/3rd interview → offer →
   accepted, plus a derived "ghosted" slice for anything gone quiet 30+ days.
 - **Expandable charts** — expand any chart or the summary card to take a closer look; expanding
