@@ -49,6 +49,40 @@ describe('applicationSchema', () => {
     }
   })
 
+  it('accepts a manually overridden lastUpdated', () => {
+    const result = applicationSchema.safeParse({
+      ...validBase,
+      appliedDate: '2026-01-01',
+      lastUpdated: '2026-01-15',
+    })
+    expect(result.success).toBe(true)
+  })
+
+  it('rejects a future lastUpdated', () => {
+    const result = applicationSchema.safeParse({
+      ...validBase,
+      lastUpdated: '2099-12-31',
+    })
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      const messages = result.error.errors.map((e) => e.message)
+      expect(messages.some((m) => m.includes('future'))).toBe(true)
+    }
+  })
+
+  it('rejects a lastUpdated before appliedDate', () => {
+    const result = applicationSchema.safeParse({
+      ...validBase,
+      appliedDate: '2026-01-15',
+      lastUpdated: '2026-01-01',
+    })
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      const paths = result.error.errors.map((e) => e.path.join('.'))
+      expect(paths).toContain('lastUpdated')
+    }
+  })
+
   it('rejects a malformed URL', () => {
     const result = applicationSchema.safeParse({
       ...validBase,

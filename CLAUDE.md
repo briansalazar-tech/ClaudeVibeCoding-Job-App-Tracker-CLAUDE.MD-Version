@@ -79,7 +79,7 @@ across `components/`, `hooks/`, and `utils/`.
 | `role` | text | required |
 | `status` | enum | see below |
 | `appliedDate` | date | required, ISO `YYYY-MM-DD` |
-| `lastUpdated` | date | auto-set on any status change |
+| `lastUpdated` | date | auto-set on any edit; manually overridable via the form |
 | `source` | enum | `linkedin` \| `referral` \| `company_site` \| `job_board` \| `recruiter` \| `other` |
 | `location` | text | nullable |
 | `workMode` | enum | `remote` \| `hybrid` \| `onsite` — nullable |

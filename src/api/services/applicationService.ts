@@ -47,7 +47,7 @@ export const applicationService = {
 
   create(input: ApplicationFormValues): Application {
     const id = uuidv4()
-    const now = today()
+    const lastUpdated = input.lastUpdated ?? today()
 
     db.prepare(
       `INSERT INTO applications
@@ -60,7 +60,7 @@ export const applicationService = {
       input.role,
       input.status,
       input.appliedDate,
-      now,
+      lastUpdated,
       input.source,
       input.location ?? null,
       input.workMode ?? null,
@@ -73,7 +73,7 @@ export const applicationService = {
 
     db.prepare(
       'INSERT INTO application_events (id, application_id, from_status, to_status, changed_at) VALUES (?,?,NULL,?,?)',
-    ).run(uuidv4(), id, input.status, now)
+    ).run(uuidv4(), id, input.status, lastUpdated)
 
     return this.getById(id)!
   },
@@ -83,6 +83,7 @@ export const applicationService = {
     if (!existing) return undefined
 
     const now = today()
+    const lastUpdated = input.lastUpdated ?? now
     const statusChanged = input.status != null && input.status !== existing.status
 
     // Always update all fields (merge input over existing)
@@ -121,14 +122,14 @@ export const applicationService = {
       merged.url,
       merged.contactName,
       merged.notes,
-      now,
+      lastUpdated,
       id,
     )
 
     if (statusChanged && input.status != null) {
       db.prepare(
         'INSERT INTO application_events (id, application_id, from_status, to_status, changed_at) VALUES (?,?,?,?,?)',
-      ).run(uuidv4(), id, existing.status, input.status, now)
+      ).run(uuidv4(), id, existing.status, input.status, lastUpdated)
     }
 
     return this.getById(id)

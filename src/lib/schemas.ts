@@ -47,6 +47,13 @@ export const applicationSchema = z
       .string()
       .regex(/^\d{4}-\d{2}-\d{2}$/, 'Must be YYYY-MM-DD')
       .refine((d) => d <= isoToday(), 'Applied date cannot be in the future'),
+    // Optional — omitted means "auto-set to today", provided means the user is
+    // manually overriding it (e.g. backfilling a historical last-contact date)
+    lastUpdated: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/, 'Must be YYYY-MM-DD')
+      .nullable()
+      .optional(),
     source: z.enum(SOURCE_VALUES),
     location: z.string().nullable().optional(),
     workMode: z.enum(WORK_MODE_VALUES).nullable().optional(),
@@ -65,6 +72,14 @@ export const applicationSchema = z
     (d) => d.salaryMin == null || d.salaryMax == null || d.salaryMin <= d.salaryMax,
     { message: 'Salary min must be ≤ salary max', path: ['salaryMax'] },
   )
+  .refine((d) => d.lastUpdated == null || d.lastUpdated <= isoToday(), {
+    message: 'Last updated cannot be in the future',
+    path: ['lastUpdated'],
+  })
+  .refine((d) => d.lastUpdated == null || d.lastUpdated >= d.appliedDate, {
+    message: 'Last updated cannot be before applied date',
+    path: ['lastUpdated'],
+  })
 
 export type ApplicationFormValues = z.infer<typeof applicationSchema>
 

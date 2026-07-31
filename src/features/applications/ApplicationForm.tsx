@@ -52,6 +52,7 @@ const defaultValues: ApplicationFormValues = {
   role: '',
   status: 'applied',
   appliedDate: isoToday(),
+  lastUpdated: null,
   source: 'linkedin',
   location: null,
   workMode: null,
@@ -78,6 +79,7 @@ export function ApplicationForm({ open, onOpenChange, application, onSubmit, onD
           role: application.role,
           status: application.status,
           appliedDate: application.appliedDate,
+          lastUpdated: application.lastUpdated,
           source: application.source,
           location: application.location ?? null,
           workMode: application.workMode ?? null,
@@ -186,6 +188,24 @@ export function ApplicationForm({ open, onOpenChange, application, onSubmit, onD
             <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
+                name="lastUpdated"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Last Updated</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="date"
+                        {...field}
+                        value={field.value ?? ''}
+                        onChange={(e) => field.onChange(e.target.value || null)}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
                 name="source"
                 render={({ field }) => (
                   <FormItem>
@@ -208,6 +228,9 @@ export function ApplicationForm({ open, onOpenChange, application, onSubmit, onD
                   </FormItem>
                 )}
               />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="workMode"
@@ -236,26 +259,25 @@ export function ApplicationForm({ open, onOpenChange, application, onSubmit, onD
                   </FormItem>
                 )}
               />
+              <FormField
+                control={form.control}
+                name="location"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Location</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="San Francisco, CA"
+                        {...field}
+                        value={field.value ?? ''}
+                        onChange={(e) => field.onChange(e.target.value || null)}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
-
-            <FormField
-              control={form.control}
-              name="location"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Location</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="San Francisco, CA"
-                      {...field}
-                      value={field.value ?? ''}
-                      onChange={(e) => field.onChange(e.target.value || null)}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
 
             <div className="grid grid-cols-2 gap-4">
               <FormField
